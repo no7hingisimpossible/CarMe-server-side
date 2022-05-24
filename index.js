@@ -63,6 +63,11 @@ async function run() {
         const result = await reviewCollection.insertOne(user)
         res.send(result)
       })
+
+      app.get("/review", async(req, res) => {
+        const cursor = await reviewCollection.find({}).toArray()
+        res.send(cursor)
+      })
       
     } finally {
     //   await client.close();
