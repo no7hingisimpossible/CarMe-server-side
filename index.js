@@ -51,6 +51,19 @@ async function run() {
       res.send(cursor)
 
     })
+    app.delete("/products/:id", async (req, res) => {
+      const { id } = req.params;
+      const query = { _id: ObjectId(id) }
+      const result = await productCollection.deleteOne(query)
+      res.send(result)
+
+    })
+
+    app.post("/products", async (req, res) => {
+      const data = req.body;
+      const result = await productCollection.insertOne(data)
+      res.send(result);
+    })
 
     //  Getting a single product by ID 
     app.get("/products/:id", async (req, res) => {
@@ -93,10 +106,10 @@ async function run() {
       const cursor = await reviewCollection.find({}).toArray()
       res.send(cursor)
     })
-    // app.get("/order", async (req, res) => {
-    //   const cursor = await orderCollection.find({}).toArray()
-    //   res.send(cursor)
-    // })
+    app.get("/orders", async (req, res) => {
+      const cursor = await orderCollection.find({}).toArray()
+      res.send(cursor)
+    })
     app.post('/order', async (req, res) => {
       const order = req.body;
       const result = await orderCollection.insertOne(order);
@@ -133,7 +146,7 @@ async function run() {
     app.get('/admin/:email', async(req, res) => {
       const email = req.params.email; 
       const user = await usersCollection.findOne({email: email});
-      const isAdmin = user.role ==="admin"; 
+      const isAdmin = user.role === "admin"; 
       res.send({admin: isAdmin})
     })
 
