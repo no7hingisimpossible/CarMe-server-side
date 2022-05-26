@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken')
 require('dotenv').config();
 
 const app = express();
@@ -20,6 +21,7 @@ async function run() {
     const profile = client.db('profile').collection('client')
     const reviewCollection = client.db('user').collection('reviews')
     const orderCollection = client.db('order').collection('orders')
+    const usersCollection = client.db('carMe').collection('user')
 
     //   Getting all products
     app.get("/products", async (req, res) => {
@@ -69,6 +71,10 @@ async function run() {
       const cursor = await reviewCollection.find({}).toArray()
       res.send(cursor)
     })
+    app.get("/order", async (req, res) => {
+      const cursor = await orderCollection.find({}).toArray()
+      res.send(cursor)
+    })
     app.post('/order', async (req, res) => {
       const order = req.body;
       const result = await orderCollection.insertOne(order);
@@ -82,12 +88,25 @@ async function run() {
       res.send(result)
     })
     app.delete('/order/:id', async (req, res) => {
-      const id = req.params;
-            const query = {_id: ObjectId(id)}
-            console.log(id);
-            const result = await orderCollection.deleteOne(query)
-            res.send(result)
+      const {id} = req.params;
+      const query = { _id: ObjectId(id) }
+      console.log(id);
+      const result = await orderCollection.deleteOne(query)
+      res.send(result)
     })
+
+    app.put('/user/:email', async(req, res) => {
+      const email = req.params.email; 
+      const user = req.body; 
+      const filter = {email: email}; 
+      const options = { upsert: true}; 
+      const updateDoc = {
+        $set: user,
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc, options); 
+      res.send(result)
+    })
+
 
   } finally {
     //   await client.close();
